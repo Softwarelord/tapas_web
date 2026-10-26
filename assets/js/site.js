@@ -155,7 +155,25 @@
   function entityName() {
     return esc(ENTITY_NAME) + (ENTITY_NAME_CONFIRMED ? '' : ' <span class="tbc" title="Legal entity name to be confirmed (FS section 37)">[legal name TBC]</span>');
   }
-  var path = location.pathname.replace(/index\.html$/, '');
+  // Site root, taken from this script's own URL (…/assets/js/site.js), so the wireframe works
+  // from a web root, from a sub-folder, or opened straight from disk (file://).
+  var SCRIPT = document.currentScript && document.currentScript.src;
+  var ROOT = SCRIPT ? SCRIPT.replace(/assets\/js\/site\.js(?:[?#].*)?$/, '') : location.origin + '/';
+  var IS_FILE = location.protocol === 'file:';
+
+  // Current page as a site path, e.g. "/ai/" — used for the active menu item and the enquiry source.
+  var path = '/' + location.href.split(/[?#]/)[0].slice(ROOT.length).replace(/index\.html$/, '');
+
+  // Point site paths ("/ai/") at the real root; on file:// folders need an explicit index.html.
+  function resolveLinks() {
+    Array.prototype.forEach.call(document.querySelectorAll('a[href]'), function (a) {
+      var href = a.getAttribute('href');
+      if (/^(#|mailto:|tel:|https?:)/.test(href)) return;
+      var abs = href.charAt(0) === '/' ? ROOT + href.slice(1) : a.href;
+      if (IS_FILE) abs = abs.replace(/\/(?=[?#]|$)/, '/index.html');
+      a.setAttribute('href', abs);
+    });
+  }
 
   function contactHref(interest) {
     var q = [];
@@ -577,6 +595,7 @@
     renderForms();
     bindPhaseFlows();
     bindFilters();
+    resolveLinks();
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
