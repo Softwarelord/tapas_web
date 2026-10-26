@@ -4,14 +4,17 @@ A low-fidelity, clickable wireframe of the new Tapas Infosolutions website. It c
 
 ## Run it
 
-Plain static HTML, CSS and JS with no build step. Links are root-relative, so serve the folder from a web root:
+Plain static HTML, CSS and JS with no build step. Either:
 
-```sh
-python3 -m http.server 8000
-# open http://localhost:8000/
-```
+- **Open `index.html` directly** in a browser (double-click). All paths are relative, and on `file://` the script adds `index.html` to folder links, so navigation works from disk.
+- **Or serve the folder** to get clean URLs such as `/ai/`:
 
-Opening the files directly with `file://` does not work, because the root-relative links break.
+  ```sh
+  python3 -m http.server 8000
+  # open http://localhost:8000/
+  ```
+
+`404.html` is the one exception: it keeps root-relative paths because a server returns it for unknown URLs at any depth.
 
 ## Structure
 
